@@ -3,6 +3,7 @@ package com.gmail.goosius.siegewar.listeners;
 import com.gmail.goosius.siegewar.SiegeController;
 import com.gmail.goosius.siegewar.SiegeWar;
 import com.gmail.goosius.siegewar.enums.SiegeWarPermissionNodes;
+import com.gmail.goosius.siegewar.utils.LoyaltyPointUtil;
 import com.gmail.goosius.siegewar.utils.PermissionUtil;
 import com.gmail.goosius.siegewar.TownOccupationController;
 import com.gmail.goosius.siegewar.metadata.TownMetaDataController;
@@ -12,26 +13,21 @@ import com.gmail.goosius.siegewar.utils.SiegeWarDistanceUtil;
 import com.gmail.goosius.siegewar.utils.SiegeWarTownPeacefulnessUtil;
 import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.TownyMessaging;
-import com.palmergames.bukkit.towny.event.DeleteTownEvent;
-import com.palmergames.bukkit.towny.event.NewTownEvent;
-import com.palmergames.bukkit.towny.event.TownAddResidentRankEvent;
-import com.palmergames.bukkit.towny.event.TownPreAddResidentEvent;
-import com.palmergames.bukkit.towny.event.TownPreClaimEvent;
-import com.palmergames.bukkit.towny.event.TownSpawnEvent;
+import com.palmergames.bukkit.towny.event.*;
 import com.palmergames.bukkit.towny.event.time.dailytaxes.PreTownPaysNationTaxEvent;
 import com.palmergames.bukkit.towny.event.town.TownPreMergeEvent;
 import com.palmergames.bukkit.towny.event.town.TownPreUnclaimCmdEvent;
 import com.palmergames.bukkit.towny.event.town.TownRuinedEvent;
 import com.palmergames.bukkit.towny.event.town.TownPreSetHomeBlockEvent;
 import com.palmergames.bukkit.towny.event.town.toggle.TownToggleNeutralEvent;
-import com.palmergames.bukkit.towny.object.Town;
-import com.palmergames.bukkit.towny.object.Translatable;
-import com.palmergames.bukkit.towny.object.Translation;
-import com.palmergames.bukkit.towny.object.Translator;
+import com.palmergames.bukkit.towny.object.*;
+import com.palmergames.bukkit.towny.utils.MetaDataUtil;
 import com.palmergames.util.TimeMgmt;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+
+import static com.gmail.goosius.siegewar.utils.LoyaltyPointUtil.pointsSDF;
 
 /**
  * 
@@ -50,6 +46,11 @@ public class SiegeWarTownEventListener implements Listener {
 
 	@EventHandler(ignoreCancelled = true)
 	public void onTownGoesToRuin(TownRuinedEvent event) {
+		//Remove Loyalty Points
+		for(Resident resident : event.getTown().getResidents()) {
+			MetaDataUtil.setInt(resident, pointsSDF, 0, true);
+		}
+
 		//Remove siege if town has one
 		if (SiegeController.hasSiege(event.getTown()))
 			SiegeController.removeSiege(SiegeController.getSiege(event.getTown()));
@@ -69,6 +70,8 @@ public class SiegeWarTownEventListener implements Listener {
 				event.setCancelled(true);
 				event.setCancelMessage(Translation.of("siegewar_plugin_prefix") + Translation.of("msg_err_siege_besieged_town_cannot_recruit"));
 				return;
+			} else {
+				MetaDataUtil.setInt(event.getResident(), pointsSDF, 0, true);
 			}
 		}
 	}
@@ -261,6 +264,11 @@ public class SiegeWarTownEventListener implements Listener {
 				} else if (TownOccupationController.isTownOccupied(town)) {
 					event.setCancelled(true);
 					event.setCancelMessage(Translation.of("siegewar_plugin_prefix") + Translation.of("msg_war_siege_cannot_add_military_rank_to_occupied_resident"));
+				} else {
+					if(MetaDataUtil.getInt(event.getResident(), pointsSDF) >= 7) {
+						event.setCancelled(true);
+						event.setCancelMessage("This resident does not have enough Loyalty Points to get this rank.");
+					}
 				}
 			}
 		}
@@ -284,6 +292,16 @@ public class SiegeWarTownEventListener implements Listener {
 				event.setCancelled(false); //UN-Cancel the event
 			}
 		}
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void onResidentJoin(TownAddResidentEvent event){
+		LoyaltyPointUtil.removePointsForResident(event.getResident());
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void onResidentJoin(TownRemoveResidentEvent event){
+		LoyaltyPointUtil.removePointsForResident(event.getResident());
 	}
 
 }

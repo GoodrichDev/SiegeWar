@@ -9,15 +9,9 @@ import com.gmail.goosius.siegewar.objects.BattleSession;
 import com.gmail.goosius.siegewar.objects.Siege;
 import com.gmail.goosius.siegewar.settings.SiegeWarSettings;
 import com.gmail.goosius.siegewar.tasks.SiegeWarTimerTaskController;
-import com.gmail.goosius.siegewar.utils.SiegeWarBlockProtectionUtil;
-import com.gmail.goosius.siegewar.utils.SiegeWarBlockUtil;
-import com.gmail.goosius.siegewar.utils.SiegeWarDistanceUtil;
-import com.gmail.goosius.siegewar.utils.SiegeWarImmunityUtil;
-import com.gmail.goosius.siegewar.utils.SiegeWarMoneyUtil;
-import com.gmail.goosius.siegewar.utils.SiegeWarNationUtil;
-import com.gmail.goosius.siegewar.utils.SiegeWarTownPeacefulnessUtil;
-import com.gmail.goosius.siegewar.utils.SiegeWarNotificationUtil;
+import com.gmail.goosius.siegewar.utils.*;
 import com.palmergames.bukkit.towny.TownyAPI;
+import com.palmergames.bukkit.towny.TownyUniverse;
 import com.palmergames.bukkit.towny.event.NationRemoveAllyEvent;
 import com.palmergames.bukkit.towny.event.NationRemoveTownEvent;
 import com.palmergames.bukkit.towny.event.NewDayEvent;
@@ -113,6 +107,9 @@ public class SiegeWarTownyEventListener implements Listener {
             }
             SiegeWarNationUtil.updateNationDemoralizationCounters();
             SiegeWarMoneyUtil.calculateEstimatedTotalMoneyInEconomy(false);
+            for (Nation nation : TownyUniverse.getInstance().getNations()) {
+                LoyaltyPointUtil.incrementPointsForNationResidents(nation);
+            }
         }
     }
 

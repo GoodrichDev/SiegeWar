@@ -137,6 +137,7 @@ public class SiegeCamp {
 			}
 		}
 
+
 		// Call event
 		PreSiegeWarStartEvent preSiegeWarStartEvent = new PreSiegeWarStartEvent(siegeType, targetTown, (Nation)attacker, townOfSiegeStarter, bannerBlock, townBlock);
 		Bukkit.getPluginManager().callEvent(preSiegeWarStartEvent);

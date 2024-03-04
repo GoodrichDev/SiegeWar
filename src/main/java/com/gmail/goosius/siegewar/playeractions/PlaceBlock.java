@@ -24,6 +24,7 @@ import com.palmergames.bukkit.towny.object.TownBlock;
 import com.palmergames.bukkit.towny.object.Translatable;
 import com.palmergames.bukkit.towny.object.Translator;
 
+import com.palmergames.bukkit.towny.utils.ProximityUtil;
 import org.bukkit.Material;
 import org.bukkit.Tag;
 import org.bukkit.block.Banner;
@@ -318,6 +319,9 @@ public class PlaceBlock {
 			if (SiegeWarSettings.doesThisNationHaveTooManyActiveSieges(residentsNation))
 				throw new TownyException(translator.of("msg_err_siege_war_nation_has_too_many_active_siege_attacks"));
 
+			//Add check testTownProximityToNation(town, nation) to verify this town will be able to join after siege starts.
+			//If the conditions are not met, this will prevent the siege from starting.
+			ProximityUtil.testTownProximityToNation(nearbyTown, residentsNation);
 			//Conquest siege
 			StartConquestSiege.processStartSiegeRequest(player, residentsTown, residentsNation, nearbyTownBlock, nearbyTown, bannerBlock);
 		}

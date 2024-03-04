@@ -4,13 +4,16 @@ import com.gmail.goosius.siegewar.SiegeController;
 import com.gmail.goosius.siegewar.enums.SiegeWarPermissionNodes;
 import com.gmail.goosius.siegewar.objects.Siege;
 import com.gmail.goosius.siegewar.settings.SiegeWarSettings;
+import com.gmail.goosius.siegewar.utils.LoyaltyPointUtil;
 import com.gmail.goosius.siegewar.utils.PermissionUtil;
 import com.gmail.goosius.siegewar.utils.SiegeWarMoneyUtil;
 import com.gmail.goosius.siegewar.TownOccupationController;
 import com.gmail.goosius.siegewar.utils.SiegeWarTownPeacefulnessUtil;
 import com.palmergames.bukkit.towny.TownyAPI;
+import com.palmergames.bukkit.towny.event.NationAddTownEvent;
 import com.palmergames.bukkit.towny.event.NationPreRemoveEnemyEvent;
 import com.palmergames.bukkit.towny.event.DeleteNationEvent;
+import com.palmergames.bukkit.towny.event.NationRemoveTownEvent;
 import com.palmergames.bukkit.towny.event.nation.NationPreTownLeaveEvent;
 import com.palmergames.bukkit.towny.event.nation.NationRankAddEvent;
 import com.palmergames.bukkit.towny.event.nation.NationKingChangeEvent;
@@ -21,8 +24,11 @@ import com.palmergames.bukkit.towny.object.Resident;
 import com.palmergames.bukkit.towny.object.Town;
 import com.palmergames.bukkit.towny.object.Translatable;
 import com.palmergames.bukkit.towny.object.Translation;
+import com.palmergames.bukkit.towny.utils.MetaDataUtil;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+
+import static com.gmail.goosius.siegewar.utils.LoyaltyPointUtil.pointsSDF;
 
 /**
  * 
@@ -47,6 +53,9 @@ public class SiegeWarNationEventListener implements Listener {
 				} else if (TownOccupationController.isTownOccupied(town)) {
 					event.setCancelled(true);
 					event.setCancelMessage(Translation.of("siegewar_plugin_prefix") + Translation.of("msg_war_siege_cannot_add_military_rank_to_occupied_resident"));
+				} else if(MetaDataUtil.getInt(event.getResident(), pointsSDF) >= 7) {
+					event.setCancelled(true);
+					event.setCancelMessage("This resident does not have enough Loyalty Points to get this rank.");
 				}
 			}
 		}
@@ -91,6 +100,7 @@ public class SiegeWarNationEventListener implements Listener {
 		if (king != null) {
 			SiegeWarMoneyUtil.makeNationRefundAvailable(king);
 		}
+
 	}
 
 	@EventHandler (ignoreCancelled = true)
@@ -192,6 +202,26 @@ public class SiegeWarNationEventListener implements Listener {
 		if(TownOccupationController.isTownOccupied(event.getTown())) {
 			event.setCancelled(true);
 			event.setCancelMessage(Translation.of("msg_err_occupied_towns_cannot_leave_their_nations"));
+		} else {
+			for(Resident resident : event.getTown().getResidents()) {
+				MetaDataUtil.setInt(resident, pointsSDF, 0, true);
+			}
+		}
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void onNationAddTown(NationAddTownEvent event) {
+		// Reset points for all residents of the town
+		for(Resident resident : event.getTown().getResidents()) {
+			LoyaltyPointUtil.removePointsForResident(resident);
+		}
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void onNationRemoveTown(NationRemoveTownEvent event) {
+		// Reset points for all residents of the town
+		for(Resident resident : event.getTown().getResidents()) {
+			LoyaltyPointUtil.removePointsForResident(resident);
 		}
 	}
 

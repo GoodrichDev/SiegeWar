@@ -16,7 +16,7 @@
     <repository>
       <id>glaremasters repo</id>
       <url>https://repo.glaremasters.me/repository/towny/</url>
-    </repository>    
+    </repository>
     <repository>
       <id>spigot-repo</id>
       <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
@@ -33,6 +33,7 @@
       <id>citizens-repo</id>
       <url>https://repo.citizensnpcs.co/</url>
     </repository>
+
   </repositories>
 
   <dependencies>
@@ -41,13 +42,13 @@
       <artifactId>spigot-api</artifactId>
       <version>1.18.1-R0.1-SNAPSHOT</version>
       <scope>provided</scope>
-    </dependency>   
-	<dependency>
+    </dependency>
+    <dependency>
       <groupId>com.palmergames.bukkit.towny</groupId>
       <artifactId>towny</artifactId>
-      <version>0.99.3.0</version>
+      <version>0.100.1.0</version>
       <scope>provided</scope>
-	</dependency>
+    </dependency>
     <dependency>
       <groupId>com.github.TownyAdvanced</groupId>
       <artifactId>Dynmap-Towny</artifactId>

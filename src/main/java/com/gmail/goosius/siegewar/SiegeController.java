@@ -27,9 +27,10 @@ import com.gmail.goosius.siegewar.utils.SiegeCampUtil;
 import com.gmail.goosius.siegewar.utils.SiegeWarDistanceUtil;
 import com.gmail.goosius.siegewar.utils.SiegeWarNationUtil;
 import com.gmail.goosius.siegewar.utils.SiegeWarSiegeCompletionUtil;
-import com.palmergames.bukkit.towny.TownyEconomyHandler;
-import com.palmergames.bukkit.towny.TownyMessaging;
-import com.palmergames.bukkit.towny.object.Government;
+import com.palmergames.bukkit.towny.TownySettings;
+import com.palmergames.bukkit.towny.*;
+import com.palmergames.bukkit.towny.object.*;
+import com.palmergames.bukkit.towny.utils.ProximityUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -41,13 +42,9 @@ import com.gmail.goosius.siegewar.metadata.SiegeMetaDataController;
 import com.gmail.goosius.siegewar.objects.Siege;
 import com.gmail.goosius.siegewar.objects.SiegeCamp;
 import com.gmail.goosius.siegewar.utils.SiegeWarMoneyUtil;
-import com.palmergames.bukkit.towny.TownyAPI;
-import com.palmergames.bukkit.towny.TownyUniverse;
 import com.palmergames.bukkit.towny.exceptions.TownyException;
-import com.palmergames.bukkit.towny.object.Nation;
-import com.palmergames.bukkit.towny.object.Town;
-import com.palmergames.bukkit.towny.object.TownBlock;
-import com.palmergames.bukkit.towny.object.Translatable;
+
+import static com.palmergames.bukkit.towny.utils.ProximityUtil.isTownTooFarFromNation;
 
 /**
  * 
@@ -567,13 +564,15 @@ public class SiegeController {
 	public static void removeSiegeCamp(SiegeCamp camp) {
 		siegeCamps.remove(camp);
 	}
+
+
 	
 	/**
 	 * Called internally from the StartTYPESiege classes, to begin a Siege,
 	 * potentially starting with the SiegeCamp minigame.
-	 * 
+	 *
 	 * Note: SiegeCamps are called SiegeAssemblies in the config and ingame lingo.
-	 * 
+	 *
 	 * @param player             Player starting the siege using a Banner.
 	 * @param bannerBlock        Block which is the Banner.
 	 * @param siegeType          SiegeType that the Siege will be.
@@ -595,7 +594,7 @@ public class SiegeController {
 											  Town townOfSiegeStarter,
 											  TownBlock townBlock) throws TownyException {
 		SiegeCamp camp = new SiegeCamp(player, bannerBlock, siegeType, targetTown, attacker, defender, townOfSiegeStarter, townBlock);
-		
+
 		PreSiegeCampEvent event = new PreSiegeCampEvent(camp);
 		Bukkit.getPluginManager().callEvent(event);
 		if (event.isCancelled())
