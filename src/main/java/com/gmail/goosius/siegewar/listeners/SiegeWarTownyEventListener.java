@@ -36,6 +36,7 @@ import com.palmergames.bukkit.towny.event.player.PlayerKeepsInventoryEvent;
 import com.palmergames.bukkit.towny.event.teleport.OutlawTeleportEvent;
 import com.palmergames.bukkit.towny.event.time.NewHourEvent;
 import com.palmergames.bukkit.towny.event.time.NewShortTimeEvent;
+import com.palmergames.bukkit.towny.exceptions.NotRegisteredException;
 import com.palmergames.bukkit.towny.exceptions.TownyException;
 import com.palmergames.bukkit.towny.object.Nation;
 import com.palmergames.bukkit.towny.object.Resident;
@@ -135,7 +136,7 @@ public class SiegeWarTownyEventListener implements Listener {
      * On each ShortTime period, SW makes some calcuations.
      */
     @EventHandler(ignoreCancelled = true)
-    public void onShortTime(NewShortTimeEvent event) {
+    public void onShortTime(NewShortTimeEvent event) throws TownyException {
         if (SiegeWarSettings.getWarSiegeEnabled()) {
             SiegeWarNotificationUtil.sendSiegeZoneProximityWarnings();
             SiegeWarTimerTaskController.evaluateBattleSessions();
